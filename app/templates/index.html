@@ -1,0 +1,61 @@
+﻿<html>
+<head>
+<link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="css/materialize.css"  media="screen,projection"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript" src="js/materialize.min.js"></script>
+<meta http-equiv="Cache-Control" content="no-cache">
+</head>
+<body>
+<style>
+    .nav-wrapper{
+        width:70%;
+        margin: 0 auto;
+    }
+</style>
+<!-- Header -->
+<nav class="amber lighten-2">
+<div class="nav-wrapper amber lighten-2">
+    <a href="#!" class="brand-logo left black-text" style="font-weight: 600; margin-left: 1rem; height:100%;"><img src="img/logo.png" style="float:left;height:100%; padding:1rem 0; margin-right:1rem;">RecogWeetion</a>
+    <ul class="right">
+<!--         
+    <li><a onclick="switchonall()" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip="Включить все аккаунты"><i class="material-icons green-text">power_settings_new</i></a></li>
+        
+    <li><a onclick="switchoffall()" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip="Выключить все аккаунты"><i class="material-icons red-text">power_settings_new</i></a></li>
+        
+    <li><a onclick="refreshall()" style="display:none" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip="Обновить все аккаунты"><i class="material-icons">refresh</i></a></li>
+        
+    <li><a class="modal-trigger tooltipped" data-target="settings" onclick="opensettings()" data-position="bottom" data-delay="100" data-tooltip="Настройки"><i class="material-icons">more_vert</i></a></li>
+         -->
+    </ul>
+</div>
+</nav>
+
+<!-- Main block -->
+<div class="container">
+    <div class="card">
+        <div class="card-content">
+            <h4><i class="material-icons">add_a_photo</i>Send your photo</h4>
+            <form  method="POST" action="upload" enctype="multipart/form-data">
+            
+                <div class="file-field input-field">
+                <div class="btn amber lighten-2 black-text">
+                <span>File</span>
+                <input type="file" name="file">
+                </div>
+                <div class="file-path-wrapper">
+                <input class="file-path validate" type="text" placeholder="Upload a photo of the plant">
+                </div>
+            </div>
+
+            <input type="submit" value="Upload your image" class="btn btn-primary amber lighten-2 black-text">
+
+            </form>
+        </div>
+    </div>     
+</div>
+
+
+</body>
+</html>
