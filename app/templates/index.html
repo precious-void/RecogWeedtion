@@ -17,18 +17,10 @@
 <!-- Header -->
 <nav class="amber lighten-2">
 <div class="nav-wrapper amber lighten-2">
-    <a href="#!" class="brand-logo left black-text" style="font-weight: 600; margin-left: 1rem; height:100%;"><img src="img/logo.png" style="float:left;height:100%; padding:1rem 0; margin-right:1rem;">RecogWeedtion</a>
-    <ul class="right">
-<!--         
-    <li><a onclick="switchonall()" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip="Включить все аккаунты"><i class="material-icons green-text">power_settings_new</i></a></li>
-        
-    <li><a onclick="switchoffall()" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip="Выключить все аккаунты"><i class="material-icons red-text">power_settings_new</i></a></li>
-        
-    <li><a onclick="refreshall()" style="display:none" class="tooltipped" data-position="bottom" data-delay="100" data-tooltip="Обновить все аккаунты"><i class="material-icons">refresh</i></a></li>
-        
-    <li><a class="modal-trigger tooltipped" data-target="settings" onclick="opensettings()" data-position="bottom" data-delay="100" data-tooltip="Настройки"><i class="material-icons">more_vert</i></a></li>
-         -->
-    </ul>
+    <a href="#!" class="brand-logo left black-text" style="font-weight: 600; margin-left: 1rem; height:100%;">
+        <img src="img/logo.png" style="float:left;height:100%; padding:1rem 0; margin-right:1rem;">
+        RecogWeedtion
+    </a>
 </div>
 </nav>
 
@@ -36,26 +28,70 @@
 <div class="container">
     <div class="card">
         <div class="card-content">
-            <h4><i class="material-icons">add_a_photo</i>Send your photo</h4>
+            <h4><i class="material-icons left">add_a_photo</i>Send your photo</h4>
             <form  method="POST" action="upload" enctype="multipart/form-data">
-            
-                <div class="file-field input-field">
-                <div class="btn amber lighten-2 black-text">
-                <span>File</span>
-                <input type="file" name="file">
+                <div class="row">
+                    <div class="col s12 m9 file-field input-field">
+                        <div class="btn amber lighten-2 black-text">
+                            <span>File</span>
+                            <input type="file" name="file" id="fileupload">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text" placeholder="Upload a photo of the plant">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="col s10 m3">
+                        <button type="submit" value="Upload your image" class="btn btn-primary amber lighten-2 black-text">
+                            <i class="material-icons right">send</i>Upload Image
+                        </button>
+                    </div>
                 </div>
-                <div class="file-path-wrapper">
-                <input class="file-path validate" type="text" placeholder="Upload a photo of the plant">
-                </div>
-            </div>
-
-            <input type="submit" value="Upload your image" class="btn btn-primary amber lighten-2 black-text">
-
+                <img id="photo" src="#" alt="your image" style="display: none; max-width:100%;"/>
+                <p class="flow-text" id="result"></p>
             </form>
+
+            
         </div>
     </div>     
 </div>
 
 
 </body>
+<script>
+function readURL(input) {
+    if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        $('#photo').attr('src', e.target.result);
+    }
+    reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$("#fileupload").change(function() {
+    $("#photo").show();
+    readURL(this);
+});
+$('form').submit(function(e){
+    $("#photo").hide();
+    e.preventDefault();
+    var form_data = new FormData(this);
+    console.log(form_data);
+    $.ajax({
+        type: 'POST',
+        url: 'upload',
+        data: form_data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: function(answ){
+            $("input").val("");
+             $("#result").html("We recognised it as " + answ + "!");
+            
+        }
+    });
+})
+
+</script>
 </html>
