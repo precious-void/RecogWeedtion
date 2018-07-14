@@ -1,5 +1,5 @@
 ![RecogWeedtion](/img/img.png)
-App that help you to recognise whether it`s plant or weed.
+App that helps you recognise whether it`s plant or weed.
 
 Just upload your photo and we`ll make decision to protect your garden!
 
