@@ -35,8 +35,13 @@ def add_header(response):
 
 @app.route('/')
 @app.route('/index')
-def upload_file():
+def index():
     return render_template("index.html")
+
+@app.route('/identifier')
+def upload_file():
+    return render_template("identifier.html")
+
 
 
 @app.route('/upload', methods=['POST'])
