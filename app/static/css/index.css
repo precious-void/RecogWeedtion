@@ -1,0 +1,6 @@
+.nav-wrapper{
+    margin: 0 auto;
+}
+ul li a{
+    text-transform: uppercase;
+}
