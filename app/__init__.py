@@ -4,36 +4,33 @@ from werkzeug.utils import secure_filename
 
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn import model_selection
+
+import keras.backend as k
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.models import model_from_json
 import pickle
 
 from PIL import Image as im
 
+from .load import init
 
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+global model, graph
+model, graph = init()
 
+
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__, static_url_path='')
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def preprocess(image):
-    image = image.resize((32, 32), im.ANTIALIAS)
-    resize_image = np.asarray(image, dtype = int).reshape(-1)
-    return resize_image
-
-@app.after_request
-def add_header(r):
-    r.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    r.headers["Pragma"] = "no-cache"
-    r.headers["Expires"] = "0"
-    r.headers['Cache-Control'] = 'public, max-age=0'
-    return r
-
+    image = np.array(image.resize((32, 32), im.ANTIALIAS)).reshape(-1, 32, 32, 3)
+    # resize_image = image, dtype = int).reshape(-1, 32, 32, 3)
+    return image
 
 @app.route('/')
 @app.route('/index')
@@ -44,26 +41,28 @@ def index():
 def upload_file():
     return render_template("identifier.html")
 
+@app.route('/classifier')
+def upload_file_classifier():
+    return render_template("classifier.html")
 
 
 @app.route('/upload', methods=['POST'])
 def uploaded_file():
     if request.method == 'POST':
-        classes = ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherd’s Purse', 'Small-flowered Cranesbill', 'Sugar beet']
-        
+        classes = ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherd’s Purse', 'Small-flowered Cranesbill', 'Sugar beet'][::-1]
         file = request.files['file']
         filename = secure_filename(file.filename)
-        file.save(app.config['UPLOAD_FOLDER'] + "/" + filename)
+        file.save("uploads/" + filename)
 
-        image = im.open("uploads/" + filename)
-        preprocessed_image = preprocess(image)
+        image = preprocess(im.open("uploads/" + filename))
+        print("Open image")
 
-        model = pickle.load(open("logistic_model.sav", "rb"))
-        result = classes[model.predict([preprocessed_image])[0]]
-        return str(result)
-
-
-
+        with graph.as_default():
+            out = model.predict(image)
+            predicted = np.argmax(out, axis=1)[0]
+            print(out, predicted)
+            result = classes[predicted]
+            return str(result)
 
 @app.route('/js/<path:path>')
 def send_js(path):
