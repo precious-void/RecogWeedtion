@@ -41,13 +41,15 @@ def index():
 def upload_file():
     return render_template("identifier.html")
 
+@app.route('/classifier')
+def upload_file_classifier():
+    return render_template("classifier.html")
 
 
 @app.route('/upload', methods=['POST'])
 def uploaded_file():
     if request.method == 'POST':
-        classes = ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherd’s Purse', 'Small-flowered Cranesbill', 'Sugar beet']
-        
+        classes = ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherd’s Purse', 'Small-flowered Cranesbill', 'Sugar beet'][::-1]
         file = request.files['file']
         filename = secure_filename(file.filename)
         file.save("uploads/" + filename)
