@@ -34,8 +34,8 @@
     </a>
     <ul class="right black-text">
         <li><a href="index" class="black-text">Main</a></li>
-        <li><a href="" class="black-text">Recognizer</a></li>
-        <li><a href="classifier" class="black-text">classifier</a></li>
+        <li><a href="recognizer" class="black-text">Recognizer</a></li>
+        <li><a href="" class="black-text">classifier</a></li>
     </ul>
 </div>
 </div>
@@ -46,28 +46,47 @@
     <div class="card">
         <div class="card-content">
             <h4>Send your photo</h4>
-            <p>We will preproscess it and give a decision</p>
-            <form  method="POST" action="upload" enctype="multipart/form-data">
-                <div class="row">
-                    <div class="col s12 m9 file-field input-field">
-                        <div class="btn amber lighten-2 black-text">
-                            <span>File</span>
-                            <input type="file" name="file" id="fileupload">
-                        </div>
-                        <div class="file-path-wrapper">
-                            <input class="file-path validate" type="text" placeholder="Upload a photo of the plant">
-                        </div>
+            <p>We will preprocess it and give a decision.</p>
+            <form  method="POST" action="upload" enctype="multipart/form-data" class="row">
+
+                <div class="col s12 m8 file-field input-field">
+                    <div class="btn amber lighten-2 black-text">
+                        <span>File</span>
+                        <input type="file" name="file" id="fileupload" accept=".jpeg, .jpg, .png, .gif, .JPEG, .JPG, .PNG, .GIF">
                     </div>
-                    <br>
-                    <div class="col s10 m3">
-                        <button type="submit" value="Upload your image" class="btn btn-primary amber lighten-2 black-text">
-                           Upload Image
-                        </button>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text" placeholder="Upload a photo of the plant">
                     </div>
                 </div>
-                <img id="photo" src="#" alt="your image" style="display: none; max-width:100%;"/>
-                <p class="flow-text" id="result"></p>
+
+                <div class="input-field col s10 m4">
+                    <select id="select_plant">
+                        <optgroup label="Cultivar crops">
+                            <option value="0">Black-grass</option>
+                            <option value="1">Charlok</option>
+                            <option value="2">Cleaver</option>
+                            <option value="3">Common Cheeckweed</option>
+                            <option value="5">Fat Hen</option>
+                            <option value="6">Loose Silky-bent</option>
+                            <option value="8">Scentless Mayweed</option>
+                        </optgroup>
+                        <optgroup label="Weeds">
+                            <option value="4">Common wheat</option>
+                            <option value="7">Maize</option>
+                            <option value="9">Shepherd’s Purse</option>
+                            <option value="10">Small-flowered Cranesbill</option>
+                            <option value="11">Sugar beet</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="col s10">
+                    <button type="submit" value="Upload your image" class="btn btn-primary amber lighten-2 black-text">
+                       Upload Image
+                    </button>
+                </div>
             </form>
+            <img id="photo" src="#" alt="your image" style="display: none; max-width:100%;"/>
+            <p class="flow-text" id="result"></p>
 
             
         </div>
@@ -77,17 +96,21 @@
 
 </body>
 <script>
+$(document).ready(function() {
+    $('select').material_select();
+});
+</script>
+<script>
 function readURL(input) {
     if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        $("#result").html("");
-        $('#photo').attr('src', e.target.result);
-    }
-    reader.readAsDataURL(input.files[0]);
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            $("#result").html("");
+            $('#photo').attr('src', e.target.result);
+        }
+        reader.readAsDataURL(input.files[0]);
     }
 }
-
 $("#fileupload").change(function() {
     $("#photo").show();
     readURL(this);
@@ -95,18 +118,25 @@ $("#fileupload").change(function() {
 $('form').submit(function(e){
     $("#photo").hide();
     e.preventDefault();
-    var form_data = new FormData(this);
-    console.log(form_data);
+
+    var form_data = new FormData();
+    form_data.append('file', $('#fileupload').prop('files')[0]);
+    form_data.append('number', $("#select_plant").val());
+
+    console.log($("#select_plant").val());
+    var plant_class = "Black-Grass";
     $.ajax({
-        type: 'POST',
-        url: 'upload',
-        data: form_data,
+        url: 'upload_classifier',
+        dataType: 'text',
         cache: false,
         contentType: false,
         processData: false,
+        data: form_data,                         
+        type: 'post',
         success: function(answ){
             $("input").val("");
-            $("#result").html("We recognized it as " + answ + "!");
+            $('select').material_select();
+            $("#result").html("It is on the " + answ + " stage of its growth!");
         }
     });
 })

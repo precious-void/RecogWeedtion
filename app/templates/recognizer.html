@@ -46,13 +46,13 @@
     <div class="card">
         <div class="card-content">
             <h4>Send your photo</h4>
-            <p>We will preproscess it and give a decision</p>
+            <p>We will preprocess it and give a decision.</p>
             <form  method="POST" action="upload" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col s12 m9 file-field input-field">
                         <div class="btn amber lighten-2 black-text">
                             <span>File</span>
-                            <input type="file" name="file" id="fileupload">
+                            <input type="file" name="file" id="fileupload" accept=".jpeg, .jpg, .png, .gif, .JPEG, .JPG, .PNG, .GIF">
                         </div>
                         <div class="file-path-wrapper">
                             <input class="file-path validate" type="text" placeholder="Upload a photo of the plant">
@@ -96,17 +96,21 @@ $('form').submit(function(e){
     $("#photo").hide();
     e.preventDefault();
     var form_data = new FormData(this);
-    console.log(form_data);
     $.ajax({
         type: 'POST',
-        url: 'upload',
+        url: 'upload_recognizer',
         data: form_data,
         cache: false,
         contentType: false,
         processData: false,
         success: function(answ){
             $("input").val("");
-            $("#result").html("We recognized it as " + answ + "!");
+            if (answ === "False"){
+                $("#result").html("Not allowed extension");
+            }
+            else{
+                $("#result").html("We recognized it as " + answ + "!");
+            }
         }
     });
 })
