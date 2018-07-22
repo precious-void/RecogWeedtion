@@ -28,8 +28,9 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def preprocess(image):
-    image = np.array(image.resize((32, 32), im.ANTIALIAS)).reshape(-1, 32, 32, 3)
-    # resize_image = image, dtype = int).reshape(-1, 32, 32, 3)
+    image = image.convert('RGB')
+    image_resize = image.resize((32, 32), im.ANTIALIAS)
+    image = np.asarray(image_resize, dtype = float).reshape(-1, 32, 32, 3)
     return image
 
 @app.route('/')
@@ -37,9 +38,9 @@ def preprocess(image):
 def index():
     return render_template("index.html")
 
-@app.route('/identifier')
+@app.route('/recognizer')
 def upload_file():
-    return render_template("identifier.html")
+    return render_template("recognizer.html")
 
 @app.route('/classifier')
 def upload_file_classifier():
@@ -49,7 +50,7 @@ def upload_file_classifier():
 @app.route('/upload', methods=['POST'])
 def uploaded_file():
     if request.method == 'POST':
-        classes = ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherd’s Purse', 'Small-flowered Cranesbill', 'Sugar beet'][::-1]
+        classes = ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherd’s Purse', 'Small-flowered Cranesbill', 'Sugar beet']
         file = request.files['file']
         filename = secure_filename(file.filename)
         file.save("uploads/" + filename)
@@ -60,7 +61,7 @@ def uploaded_file():
         with graph.as_default():
             out = model.predict(image)
             predicted = np.argmax(out, axis=1)[0]
-            print(out, predicted)
+            print(out[0], predicted)
             result = classes[predicted]
             return str(result)
 
