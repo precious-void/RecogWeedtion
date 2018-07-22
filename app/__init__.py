@@ -1,37 +1,18 @@
 import os
 from flask import Flask, request, redirect, url_for, render_template, send_from_directory
-from werkzeug.utils import secure_filename
 
 import numpy as np
-import pandas as pd
-
-import keras.backend as k
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.models import model_from_json
-import pickle
-
 from PIL import Image as im
+import tensorflow as tf
+from keras.backend import clear_session
 
-from .load import init
-
-global model, graph
-model, graph = init()
+from .load import init_neural_network
+from .preprocessing import *
 
 
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
 app = Flask(__name__, static_url_path='')
 
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def preprocess(image):
-    image = image.convert('RGB')
-    image_resize = image.resize((32, 32), im.ANTIALIAS)
-    image = np.asarray(image_resize, dtype = float).reshape(-1, 32, 32, 3)
-    return image
 
 @app.route('/')
 @app.route('/index')
@@ -39,47 +20,48 @@ def index():
     return render_template("index.html")
 
 @app.route('/recognizer')
-def upload_file():
+def recognizer():
     return render_template("recognizer.html")
 
 @app.route('/classifier')
-def upload_file_classifier():
+def classifier():
     return render_template("classifier.html")
 
 
-@app.route('/upload', methods=['POST'])
-def uploaded_file():
+@app.route('/upload_recognizer', methods=['POST'])
+def upload_recognizer():
     if request.method == 'POST':
+        model, graph = init_neural_network("model.h5")
+
         classes = ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherd’s Purse', 'Small-flowered Cranesbill', 'Sugar beet']
-        file = request.files['file']
-        filename = secure_filename(file.filename)
-        file.save("uploads/" + filename)
+        
+        filename = save_file(request.files['file'])
+
+        if not filename:
+            return "False"
 
         image = preprocess(im.open("uploads/" + filename))
-        print("Open image")
-
         with graph.as_default():
-            out = model.predict(image)
-            predicted = np.argmax(out, axis=1)[0]
-            print(out[0], predicted)
-            result = classes[predicted]
+            result = classes[np.argmax(model.predict(image), axis = 1)[0]]
+            del model, graph
             return str(result)
 
-@app.route('/js/<path:path>')
-def send_js(path):
-    return send_from_directory('static/js', path)
+@app.route('/upload_classifier', methods=['POST'])
+def upload_classifier():
+    if request.method == 'POST':
+        recieved_class = int(request.form['number'])
+        filename = save_file(request.files['file'])
 
+        if not filename:
+            return "False"
 
-@app.route('/css/<path:path>')
-def send_css(path):
-    return send_from_directory('static/css', path)
+        model_files = ['Black-grass.h5', 'Charlock.h5', 'Cleavers.h5', 'Common_Chickweed.h5', 'Common_wheat.h5', 'Fat_Hen.h5', 'Loose_Silky-bent.h5', 'Maize.h5', 'Scentless_Mayweed.h5', 'Shepherd’s_Purse.h5', 'Small-flowered_Cranesbill.h5', 'Sugar_beet.h5']
+        image = preprocess(im.open("uploads/" + filename))
 
+        model, graph = init_neural_network("CNN/" + model_files[recieved_class])
 
-@app.route('/fonts/<path:path>')
-def send_fonts(path):
-    return send_from_directory('static/fonts', path)
-
-
-@app.route('/img/<path:path>')
-def send_img(path):
-    return send_from_directory('static/img', path)
+        with graph.as_default():
+            # print(model.predict(image))
+            result = np.argmax(model.predict(image), axis = 1)[0]
+            del model, graph
+            return str(result + 1)
