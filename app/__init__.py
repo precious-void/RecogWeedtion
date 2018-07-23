@@ -61,7 +61,6 @@ def upload_classifier():
         model, graph = init_neural_network("CNN/" + model_files[recieved_class])
 
         with graph.as_default():
-            # print(model.predict(image))
             result = np.argmax(model.predict(image), axis = 1)[0]
             del model, graph
             return str(result + 1)

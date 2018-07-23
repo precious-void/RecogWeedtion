@@ -5,9 +5,10 @@ Just upload your photo and we`ll make decision to protect your garden!
 
 ## Installization
 1. Clone repositiry
-2. Install **Flask**
+2. Install **Flask**, **Keras 2.1.6**
 ```
 pip install flask
+pip install keras==2.1.6
 ```
 3. Run Programm
 ```shell

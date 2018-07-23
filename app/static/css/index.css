@@ -4,3 +4,13 @@
 ul li a{
     text-transform: uppercase;
 }
+#photo{
+    display:block;
+    margin: 0 auto;
+    max-width: 500px;
+}
+@media only screen and (min-width: 601px){
+    #photo{
+        max-width: 100%;
+    }
+}
