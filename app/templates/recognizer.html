@@ -17,13 +17,6 @@
 
 </head>
 <body>
-
-<style>
-    .nav-wrapper{
-        margin: 0 auto;
-    }
-</style>
-
 <!-- Header -->
 <nav class="amber lighten-2">
 <div class="container">
@@ -93,7 +86,6 @@ $("#fileupload").change(function() {
     readURL(this);
 });
 $('form').submit(function(e){
-    $("#photo").hide();
     e.preventDefault();
     var form_data = new FormData(this);
     $.ajax({
